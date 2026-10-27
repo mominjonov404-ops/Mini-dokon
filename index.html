@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a8f63">
+<meta name="description" content="Instagram va Telegram sotuvchilari uchun tayyor onlayn do'kon. Mahsulot qo'shing, havolani ulashing, buyurtma oling.">
+<title>MiniDokon</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230a8f63'/%3E%3Cpath d='M8 13l1.5-5h13L24 13M9 13v11h14V13' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Plus+Jakarta+Sans:wght@400..800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+/* Yo'nalish: toza, premium savdo platformasi. Zumrad yashil asosiy rang, oltin faqat Pro uchun. */
+:root{
+  --bg:#f3f6f4; --surface:#ffffff; --surface-2:#eaf0ed; --ink:#0b1512; --ink-2:#3b4a43; --mute:#6c7b74;
+  --line:#dde5e0; --brand:#0a8f63; --brand-2:#067050; --brand-soft:#e1f4ec; --on-brand:#ffffff;
+  --gold:#9a6b12; --gold-soft:#f8efd9; --danger:#b3261e; --danger-soft:#fbe9e7;
+  --shadow:0 1px 2px rgba(11,21,18,.05),0 8px 24px -8px rgba(11,21,18,.12);
+  --shadow-lg:0 24px 60px -20px rgba(6,60,42,.35);
+  --font-display:"Bricolage Grotesque","Plus Jakarta Sans",system-ui,sans-serif;
+  --font-body:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#08100d; --surface:#111b17; --surface-2:#182520; --ink:#e9f2ed; --ink-2:#b4c4bb; --mute:#83958b;
+    --line:#223129; --brand:#2fd49a; --brand-2:#5be3b4; --brand-soft:#0f2a20; --on-brand:#04251a;
+    --gold:#e3b559; --gold-soft:#2a2210; --danger:#ff8f86; --danger-soft:#2d1614;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -10px rgba(0,0,0,.6);
+    --shadow-lg:0 24px 60px -20px rgba(0,0,0,.7);
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--ink);line-height:1.55;min-height:100vh;-webkit-font-smoothing:antialiased;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:inherit}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:8px}
+h1,h2,h3{font-family:var(--font-display);letter-spacing:-.02em;text-wrap:balance}
+.wrap{max-width:1080px;margin:0 auto}
+svg{flex:none}
+
+/* ---- tugmalar ---- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:0 18px;height:46px;border-radius:12px;cursor:pointer;font-weight:700;font-size:15px;text-decoration:none;transition:transform .12s,background .15s,border-color .15s,box-shadow .15s;white-space:nowrap}
+.btn:hover{border-color:var(--mute)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--on-brand);box-shadow:0 8px 20px -8px var(--brand)}
+.btn.primary:hover{background:var(--brand-2);border-color:var(--brand-2)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn.sm{height:36px;padding:0 12px;font-size:13.5px;border-radius:10px}
+.btn.lg{height:54px;padding:0 26px;font-size:16px;border-radius:14px}
+.btn.block{width:100%}
+.btn.danger{color:var(--danger)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#fff}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.icon-btn{width:36px;height:36px;padding:0}
+
+/* ---- yuqori panel ---- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:0 max(16px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.top .in{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:64px;gap:10px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:-.03em;text-decoration:none;cursor:pointer;min-width:0}
+.logo .mark{width:34px;height:34px;border-radius:10px;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center}
+.logo span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav{display:flex;gap:4px;align-items:center}
+.nav a.l{padding:8px 12px;border-radius:10px;font-weight:600;font-size:14.5px;color:var(--ink-2);text-decoration:none;cursor:pointer}
+.nav a.l:hover{background:var(--surface-2)}
+@media(max-width:720px){.nav a.l{display:none}}
+.actions{display:flex;gap:8px;align-items:center}
+
+/* ---- bosh sahifa ---- */
+.hero{position:relative;padding:56px 0 40px;display:grid;gap:40px;grid-template-columns:1.1fr .9fr;align-items:center}
+@media(max-width:860px){.hero{grid-template-columns:1fr;padding-top:36px}}
+.hero::before{content:"";position:absolute;inset:-80px -40vw auto;height:520px;background:radial-gradient(60% 60% at 70% 20%,color-mix(in srgb,var(--brand) 22%,transparent),transparent 70%);z-index:-1;pointer-events:none}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:999px;background:var(--brand-soft);color:var(--brand-2);font-weight:700;font-size:13px;margin-bottom:18px}
+.eyebrow i{width:20px;height:20px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:flex;align-items:center;justify-content:center}
+.hero h1{font-size:clamp(36px,6.4vw,64px);line-height:1.04;font-weight:800;margin-bottom:18px}
+.hero h1 em{font-style:normal;color:var(--brand)}
+.hero p.lead{font-size:clamp(16px,2.2vw,19px);color:var(--ink-2);max-width:520px;margin-bottom:26px}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+.trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;color:var(--mute);font-size:14px;font-weight:600}
+.trust span{display:flex;gap:6px;align-items:center}
+.trust svg{color:var(--brand)}
+
+.phone{position:relative;max-width:320px;margin:0 auto;border-radius:38px;padding:10px;background:var(--ink);box-shadow:var(--shadow-lg)}
+.phone .scr{border-radius:30px;background:var(--bg);overflow:hidden;color:var(--ink)}
+.phone .bar{display:flex;align-items:center;gap:10px;padding:14px 14px 10px}
+.phone .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0a8f63,#7ad9b6);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:var(--font-display)}
+.phone .bar b{display:block;font-size:14px;line-height:1.2}
+.phone .bar small{color:var(--mute);font-size:11.5px}
+.phone .tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:6px 12px 14px}
+.phone .tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.phone .tile .im{aspect-ratio:1;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.9)}
+.phone .tile .tx{padding:7px 9px 9px;font-size:11.5px;line-height:1.3}
+.phone .tile .tx b{display:block;font-size:12px}
+.phone .tile .tx span{color:var(--brand-2);font-weight:800}
+.phone .order{margin:0 12px 14px;padding:11px;border-radius:12px;background:var(--brand);color:var(--on-brand);display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700}
+.phone .tag{position:absolute;top:-12px;right:-8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:700;box-shadow:var(--shadow);display:flex;gap:6px;align-items:center}
+.phone .tag i{width:8px;height:8px;border-radius:50%;background:var(--brand);display:block}
+
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0;border:1px solid var(--line);border-radius:18px;background:var(--surface);overflow:hidden;margin:16px 0 64px}
+.strip div{padding:20px 22px;border-right:1px solid var(--line)}
+.strip div:last-child{border-right:0}
+.strip b{display:block;font-family:var(--font-display);font-size:26px;letter-spacing:-.03em}
+.strip span{color:var(--mute);font-size:14px}
+@media(max-width:700px){.strip div{border-right:0;border-bottom:1px solid var(--line)}.strip div:last-child{border-bottom:0}}
+
+.section{padding:0 0 72px}
+.section .head{max-width:560px;margin-bottom:28px}
+.section .kicker{color:var(--brand);font-weight:800;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.section h2{font-size:clamp(26px,4.4vw,40px);line-height:1.1;margin-bottom:10px}
+.section .head p{color:var(--ink-2);font-size:17px}
+.feat{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.feat .f{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px}
+.feat .ic{width:44px;height:44px;border-radius:12px;background:var(--brand-soft);color:var(--brand-2);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.feat h3{font-size:18px;margin-bottom:6px}
+.feat p{color:var(--ink-2);font-size:15px}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;counter-reset:s}
+.how .s{padding:6px 24px 6px 0;position:relative}
+.how .s .n{width:40px;height:40px;border-radius:50%;border:2px solid var(--brand);color:var(--brand);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;margin-bottom:12px;background:var(--bg)}
+.how .s h3{font-size:17px;margin-bottom:4px}
+.how .s p{color:var(--ink-2);font-size:14.5px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;max-width:760px}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:26px}
+.plan h3{font-size:20px}
+.plan .pr{font-family:var(--font-display);font-size:40px;font-weight:800;letter-spacing:-.04em;margin:8px 0 14px}
+.plan .pr small{font-family:var(--font-body);font-size:14px;font-weight:600;color:var(--mute);letter-spacing:0}
+.plan ul{list-style:none;display:grid;gap:10px;margin-bottom:20px}
+.plan li{display:flex;gap:10px;font-size:15px;color:var(--ink-2)}
+.plan li svg{color:var(--brand);margin-top:3px}
+.plan.pro{border:1.5px solid var(--gold);background:linear-gradient(180deg,var(--gold-soft),var(--surface) 60%)}
+.plan.pro .badge-gold{display:inline-block;background:var(--gold);color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;margin-bottom:8px}
+details.q{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:0 18px;margin-bottom:10px}
+details.q summary{cursor:pointer;font-weight:700;padding:16px 0;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:center}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary svg{transition:transform .2s;color:var(--mute)}
+details.q[open] summary svg{transform:rotate(45deg)}
+details.q p{color:var(--ink-2);padding-bottom:16px;font-size:15px}
+.banner{background:var(--ink);color:var(--bg);border-radius:24px;padding:clamp(28px,6vw,56px);display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:56px}
+.banner h2{font-size:clamp(24px,4vw,36px);max-width:520px}
+.foot{border-top:1px solid var(--line);padding:26px 0 40px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:14px}
+.foot a{color:var(--brand);font-weight:700;cursor:pointer;text-decoration:none}
+
+/* ---- shakllar ---- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+.form{display:grid;gap:14px}
+label.f{display:grid;gap:6px;font-size:13.5px;font-weight:700;color:var(--ink-2)}
+label.f .h{font-weight:500;color:var(--mute);font-size:12.5px}
+input[type=text],input[type=email],input[type=password],input[type=tel],input[type=number],input[type=search],textarea,select{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:0 14px;height:48px;outline:none;transition:border-color .15s,box-shadow .15s;color:var(--ink)}
+textarea{height:auto;min-height:84px;padding:12px 14px;resize:vertical}
+input:focus,textarea:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 4px color-mix(in srgb,var(--brand) 18%,transparent)}
+input[type=file]{padding:10px 12px;height:auto}
+.prefix{display:flex;align-items:center;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;overflow:hidden}
+.prefix:focus-within{border-color:var(--brand);box-shadow:0 0 0 4px color-mix(in srgb,var(--brand) 18%,transparent)}
+.prefix span{padding:0 4px 0 14px;color:var(--mute);font-weight:600;font-size:14px;white-space:nowrap}
+.prefix input{border:0;box-shadow:none!important;padding-left:2px;min-width:0}
+.msg{padding:11px 14px;border-radius:12px;font-size:14px;font-weight:600}
+.msg.err{background:var(--danger-soft);color:var(--danger)}
+.msg.ok{background:var(--brand-soft);color:var(--brand-2)}
+.auth{max-width:440px;margin:40px auto}
+.auth h2{font-size:28px;margin-bottom:4px}
+.auth .sub{color:var(--mute);margin-bottom:18px}
+
+/* ---- panel ---- */
+.dash-head{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:24px 0 8px}
+.dash-head h1{font-size:clamp(24px,4vw,32px)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:800;background:var(--surface-2);color:var(--mute)}
+.pill.pro{background:var(--gold-soft);color:var(--gold)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.stat small{color:var(--mute);font-weight:600;font-size:12.5px}
+.stat b{display:block;font-family:var(--font-display);font-size:28px;letter-spacing:-.03em;line-height:1.2}
+.stat.hot b{color:var(--brand)}
+.linkbox{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--brand-soft);border:1px solid color-mix(in srgb,var(--brand) 25%,transparent);border-radius:16px;padding:12px 14px}
+.linkbox .u{-webkit-user-select:all;user-select:all;flex:1;min-width:0;font-weight:700;font-size:14.5px;color:var(--brand-2);word-break:break-all;display:flex;gap:8px;align-items:center}
+.linkbox .bt{display:flex;gap:8px;flex-wrap:wrap}
+.seg{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:14px;margin:18px 0;overflow-x:auto}
+.seg button{flex:1;border:0;background:transparent;border-radius:10px;height:40px;padding:0 14px;cursor:pointer;font-weight:700;font-size:14px;color:var(--mute);display:flex;gap:8px;align-items:center;justify-content:center;white-space:nowrap}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.badge{background:var(--brand);color:var(--on-brand);border-radius:999px;min-width:20px;height:20px;padding:0 6px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap}
+.toolbar .cnt{color:var(--mute);font-weight:600;font-size:14px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
+@media(min-width:640px){.grid{grid-template-columns:repeat(3,1fr);gap:16px}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr)}}
+.prod{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:transform .18s,box-shadow .18s;min-width:0}
+.prod:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.prod .im{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.92);overflow:hidden;cursor:pointer;position:relative}
+.prod .im img{width:100%;height:100%;object-fit:cover;display:block}
+.prod .bd{padding:12px 14px 6px;display:grid;gap:3px;flex:1;min-width:0}
+.prod .nm{font-weight:700;font-size:15px;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.prod .pc{font-family:var(--font-display);font-weight:800;font-size:17px;color:var(--brand-2);letter-spacing:-.02em}
+.prod .ac{padding:8px 12px 12px;display:flex;gap:6px}
+.prod.off .im{opacity:.45}
+.prod .flag{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.65);color:#fff;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}
+.order{display:grid;gap:8px;margin-bottom:10px}
+.order .meta{color:var(--mute);font-size:13px}
+.order a.ph{color:var(--brand-2);font-weight:800;text-decoration:none}
+.st{font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--gold-soft);color:var(--gold)}
+.st.done{background:var(--brand-soft);color:var(--brand-2)}
+.st.cancelled{background:var(--surface-2);color:var(--mute)}
+.empty{text-align:center;color:var(--mute);padding:44px 16px;border:1.5px dashed var(--line);border-radius:18px}
+.empty svg{color:var(--brand);margin-bottom:10px}
+.empty b{display:block;color:var(--ink);font-family:var(--font-display);font-size:18px;margin-bottom:4px}
+
+/* ---- ochiq do'kon ---- */
+.cover{margin-top:16px;border-radius:24px;overflow:hidden;position:relative;color:#fff;padding:clamp(22px,5vw,40px);min-height:170px;display:flex;align-items:flex-end}
+.cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 20%,rgba(0,0,0,.35));pointer-events:none}
+.cover .ct{position:relative;z-index:1;display:flex;gap:16px;align-items:center;flex-wrap:wrap;width:100%}
+.cover .big{width:68px;height:68px;border-radius:20px;background:rgba(255,255,255,.2);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:30px;border:1px solid rgba(255,255,255,.35)}
+.cover h1{font-size:clamp(26px,5vw,40px);line-height:1.1}
+.cover p{opacity:.92;max-width:560px;margin-top:2px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 6px}
+.chip{display:inline-flex;gap:8px;align-items:center;padding:0 14px;height:38px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:14px;font-weight:600;text-decoration:none;cursor:pointer}
+.chip:hover{border-color:var(--brand)}
+.chip svg{color:var(--brand)}
+.search{position:relative;margin:14px 0 18px}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--mute)}
+.search input{padding-left:44px;height:50px;border-radius:14px}
+.qty{display:inline-flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.qty button{width:38px;height:38px;border:0;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.qty button:hover{background:var(--surface-2)}
+.qty span{min-width:30px;text-align:center;font-weight:800}
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px max(16px,env(safe-area-inset-left,0px)) calc(10px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.cartbar .in{max-width:560px;margin:0 auto;pointer-events:auto;background:var(--ink);color:var(--bg);border-radius:18px;padding:10px 10px 10px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 16px 40px -12px rgba(0,0,0,.5);cursor:pointer}
+.cartbar b{font-family:var(--font-display);font-size:17px}
+.cartbar small{opacity:.75;display:block;font-size:12.5px}
+.cartbar .go{height:44px;padding:0 18px;border-radius:12px;background:var(--brand);color:var(--on-brand);border:0;font-weight:800;display:flex;align-items:center;gap:8px;cursor:pointer}
+
+/* ---- oyna ---- */
+.modal{position:fixed;inset:0;background:rgba(5,12,9,.6);backdrop-filter:blur(3px);z-index:60;display:flex;align-items:flex-end;justify-content:center;animation:fade .15s}
+@media(min-width:700px){.modal{align-items:center}}
+.sheet{background:var(--surface);width:100%;max-width:480px;border-radius:24px 24px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow:auto;animation:up .22s cubic-bezier(.2,.8,.2,1)}
+@media(min-width:700px){.sheet{border-radius:24px}}
+.sheet .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+.sheet h3{font-size:22px}
+.sheet .pimg{aspect-ratio:4/3;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.92);margin-bottom:14px}
+.sheet .pimg img{width:100%;height:100%;object-fit:cover}
+.line{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.line .th{width:52px;height:52px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#fff}
+.line .th img{width:100%;height:100%;object-fit:cover}
+.line .tx{flex:1;min-width:0}
+.line .tx b{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.line .tx small{color:var(--brand-2);font-weight:800}
+.total{display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-weight:700}
+.total b{font-family:var(--font-display);font-size:22px;letter-spacing:-.02em}
+.imgprev{width:96px;height:96px;border-radius:14px;object-fit:cover;background:var(--brand-soft)}
+.flash{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;font-weight:700;font-size:14px;z-index:90;box-shadow:var(--shadow-lg);animation:up .2s;max-width:90vw}
+.paycard{background:linear-gradient(135deg,#0a8f63,#056046);color:#fff;border-radius:18px;padding:18px;margin:14px 0}
+.paycard small{opacity:.8;display:block;font-size:12.5px}
+.paycard .num{-webkit-user-select:all;user-select:all;font-family:var(--font-display);font-size:clamp(20px,6vw,26px);font-weight:800;letter-spacing:.04em;margin:6px 0 12px;word-break:break-all}
+.paycard .row2{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.paycard .btn{background:rgba(255,255,255,.18);border-color:transparent;color:#fff}
+.rcpt{display:block;width:84px;height:84px;border-radius:12px;overflow:hidden;background:var(--surface-2);flex:none}
+.rcpt img{width:100%;height:100%;object-fit:cover;display:block}
+.pay-row{display:flex;gap:12px;align-items:flex-start}
+@media(max-width:520px){.adm-hide{display:none}}
+.stats.s4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.stat small+b+small{display:block;margin-top:2px}
+.tblw{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+table.tbl{width:100%;border-collapse:collapse;font-size:14px;min-width:820px}
+.tbl th{text-align:left;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:var(--surface-2)}
+.bars{display:flex;align-items:flex-end;gap:6px;height:130px}
+.bars .b{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;min-width:0;height:100%}
+.bars .b i{display:block;width:100%;background:var(--brand);border-radius:6px 6px 2px 2px}
+.bars .b span{font-size:11.5px;color:var(--mute);font-weight:700;line-height:1}
+.loader{display:flex;justify-content:center;padding:90px 0}
+.loader i{width:34px;height:34px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--brand);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div id="app"><div class="loader"><i></i></div></div>
+<div id="flash"></div>
+
+<script>
+/* ===== SOZLAMALAR ===== */
+const SUPABASE_URL = 'https://fbrozejtidtohgmeroep.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_zvrCjGf_9CCQIMkHjNv5kg_4sSzH95C';
+const PAY_CARD = '9860 1601 1957 3139';    // karta raqami, masalan '8600 1234 5678 9012'
+const PAY_HOLDER = '';  // karta egasining ismi, masalan 'ABDULBORIY M.'
+const PLANS = [{m:1,price:40000,label:'1 oy'},{m:3,price:110000,label:'3 oy'},{m:12,price:400000,label:'12 oy'}];
+const SUPPORT_TG = 'wonstayle'; // Pro to'lov uchun sizning Telegram username'ingiz (@ belgisisiz)
+const PRO_PRICE = PLANS[0].price;
+const FREE_LIMIT = 10;
+/* ======================= */
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const app = document.getElementById('app');
+const S = { user:null, store:null, products:[], orders:[], tab:'products', msg:null, authMode:'signup',
+  editing:null, shop:null, shopProducts:[], q:'', detail:null, cart:{}, cartOpen:false, orderDone:null, isAdmin:false, payments:[], payOpen:false, payMonths:1, adm:null, admTab:'over', admQ:'', admErr:'', admWarn:'', admConfirm:null, cfg:{} };
+
+/* ---------- SVG ikonkalar ---------- */
+const I = (d,s=20,w=2)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const IC = {
+  store:s=>I('<path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9"/><path d="M3 9c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3c0 1.7 1.3 3 3 3s3-1.3 3-3"/>',s),
+  plus:s=>I('<path d="M12 5v14M5 12h14"/>',s),
+  minus:s=>I('<path d="M5 12h14"/>',s),
+  x:s=>I('<path d="M18 6L6 18M6 6l12 12"/>',s),
+  box:s=>I('<path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>',s),
+  bag:s=>I('<path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/>',s),
+  trash:s=>I('<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/>',s),
+  link:s=>I('<path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/>',s),
+  send:s=>I('<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/>',s),
+  check:s=>I('<path d="M20 6L9 17l-5-5"/>',s,2.4),
+  phone:s=>I('<path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/>',s),
+  image:s=>I('<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',s,1.7),
+  user:s=>I('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/>',s),
+  cog:s=>I('<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>',s),
+  search:s=>I('<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',s),
+  edit:s=>I('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>',s),
+  copy:s=>I('<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',s),
+  ext:s=>I('<path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/>',s),
+  arrow:s=>I('<path d="M5 12h14M12 5l7 7"/>',s),
+  shield:s=>I('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',s),
+  zap:s=>I('<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>',s),
+  chart:s=>I('<path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/>',s),
+  smart:s=>I('<rect x="5" y="2" width="14" height="20" rx="3"/><path d="M12 18h.01"/>',s),
+  eye:s=>I('<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',s),
+  eyeoff:s=>I('<path d="M17.9 17.9A10.9 10.9 0 0112 20C5 20 1 12 1 12a18.5 18.5 0 015.1-5.9M9.9 4.2A10.7 10.7 0 0112 4c7 0 11 8 11 8a18.6 18.6 0 01-2.2 3.2"/><path d="M1 1l22 22"/>',s),
+  share:s=>I('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>',s),
+  plusc:s=>I('<path d="M12 5v14M5 12h14"/>',s),
+  card:s=>I('<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20M6 15h4"/>',s),
+  upload:s=>I('<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 20h16"/>',s)
+};
+
+/* ---------- yordamchilar ---------- */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => Number(n||0).toLocaleString('ru-RU').replace(/ /g,' ') + " so'm";
+const cleanTg = t => String(t||'').trim().replace(/^@/,'').replace(/^https?:\/\/t\.me\//,'');
+const slugify = s => String(s).toLowerCase().replace(/[^a-z0-9-]/g,'').slice(0,30);
+const shopUrl = slug => location.origin + location.pathname + '#/s/' + slug;
+const isPro = st => !!(st && st.plan==='pro' && st.plan_until && new Date(st.plan_until) >= new Date(new Date().toDateString()));
+const go = h => { if (location.hash===h) route(); else location.hash = h; };
+const hue = s => { let h=0; for (const c of String(s||'x')) h=(h*31+c.charCodeAt(0))%360; return h; };
+const grad = s => { const h=hue(s); return `linear-gradient(135deg,hsl(${h} 55% 42%),hsl(${(h+40)%360} 60% 58%))`; };
+const initial = s => (String(s||'?').trim()[0]||'?').toUpperCase();
+function lsGet(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+async function copyText(t){
+  t = String(t);
+  try{ if (navigator.clipboard && window.isSecureContext){ await navigator.clipboard.writeText(t); return true; } }catch(_){}
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = t; ta.setAttribute('readonly','');
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;font-size:16px';
+    document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0,t.length);
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  }catch(_){ return false; }
+}
+let flashT;
+function flash(t){ const f=document.getElementById('flash'); f.innerHTML=`<div class="flash">${esc(t)}</div>`; clearTimeout(flashT); flashT=setTimeout(()=>f.innerHTML='',2200); }
+function note(el,type,text){ if (el) el.innerHTML = `<div class="msg ${type}">${esc(text)}</div>`; }
+function errText(e){
+  const m = (e && e.message) || String(e);
+  if (/different from the old|same_password/i.test(m)) return "Yangi parol eskisidan farq qilsin.";
+  if (/PENDING/.test(m)) return "Avvalgi to'lovingiz hali tekshirilmoqda.";
+  if (/LIMIT/.test(m)) return `Bepul tarifda ${FREE_LIMIT} tagacha mahsulot qo'shish mumkin. Cheksiz mahsulot uchun Pro tarifga o'ting.`;
+  if (/duplicate key|23505/.test(m)) return 'Bu manzil band. Boshqa manzil tanlang.';
+  if (/Invalid login/i.test(m)) return "Email yoki parol noto'g'ri.";
+  if (/already registered/i.test(m)) return "Bu email ro'yxatdan o'tgan. Kirish bo'limiga o'ting.";
+  if (/Password should/i.test(m)) return "Parol kamida 6 belgidan iborat bo'lsin.";
+  if (/Email not confirmed/i.test(m)) return "Emailingizni tasdiqlang: pochtangizga xat yuborilgan.";
+  if (/rate limit/i.test(m)) return "Juda ko'p urinish. Birozdan keyin qayta urinib ko'ring.";
+  if (/Failed to fetch|NetworkError/i.test(m)) return "Internet aloqasi yo'q. Qayta urinib ko'ring.";
+  return m;
+}
+
+/* ---------- ma'lumot ---------- */
+async function loadMine(){
+  if (!S.user){ S.store=null; S.products=[]; S.orders=[]; return; }
+  const { data:st } = await sb.from('mdk_stores').select('*').eq('owner', S.user.id).maybeSingle();
+  S.store = st || null;
+  if (st){
+    const [p,o,pay] = await Promise.all([
+      sb.from('mdk_products').select('*').eq('store_id', st.id).order('created_at',{ascending:false}),
+      sb.from('mdk_orders').select('*').eq('store_id', st.id).order('created_at',{ascending:false}).limit(300),
+      sb.from('mdk_payments').select('*').eq('store_id', st.id).order('created_at',{ascending:false}).limit(20)
+    ]);
+    S.products = p.data||[]; S.orders = o.data||[]; S.payments = pay.data||[];
+  } else { S.products=[]; S.orders=[]; S.payments=[]; }
+}
+async function loadShop(slug){
+  const { data:st } = await sb.from('mdk_stores').select('id,slug,name,description,telegram,phone').eq('slug', slug).maybeSingle();
+  S.shop = st || null; S.shopProducts = [];
+  if (st){
+    const { data:p } = await sb.from('mdk_products').select('*').eq('store_id', st.id).eq('active', true).order('created_at',{ascending:false});
+    S.shopProducts = p||[];
+    const saved = lsGet('mdk-cart-'+slug) || {};
+    S.cart = {};
+    for (const id in saved) if (S.shopProducts.some(x=>x.id===id) && saved[id]>0) S.cart[id]=saved[id];
+  }
+}
+async function checkAdmin(){
+  if (!S.user){ S.isAdmin=false; return; }
+  try{ const { data, error } = await sb.rpc('mdk_is_admin'); S.isAdmin = !error && data===true; }catch(e){ S.isAdmin=false; }
+}
+async function loadAdmin(){
+  S.admWarn = '';
+  const [pay, stats, dir] = await Promise.all([
+    sb.from('mdk_payments').select('*, mdk_stores(name,slug)').order('created_at',{ascending:false}).limit(200),
+    sb.rpc('mdk_admin_stats'),
+    sb.rpc('mdk_admin_directory')
+  ]);
+  if (stats.error || dir.error) S.admWarn = "Admin funksiyalari bazada topilmadi. admin-setup.sql faylini Supabase SQL Editor'da ishga tushiring.";
+  const list = pay.data || [];
+  const urls = {};
+  if (list.length){
+    const { data } = await sb.storage.from('mdk-receipts').createSignedUrls(list.map(p=>p.receipt_path), 3600);
+    (data||[]).forEach(r=>{ if (r.signedUrl) urls[r.path]=r.signedUrl; });
+  }
+  S.adm = { payments:list.map(p=>({ ...p, url:urls[p.receipt_path]||'' })), stats:stats.data||{}, users:dir.data||[] };
+}
+async function loadCfg(){
+  try{ const { data, error } = await sb.from('mdk_config').select('key,value'); if (!error && data) data.forEach(r=>{ S.cfg[r.key]=r.value; }); }catch(e){}
+}
+function payCard(){ return S.cfg.pay_card || PAY_CARD; }
+function payHolder(){ return S.cfg.pay_holder || PAY_HOLDER; }
+const saveCart = () => { if (S.shop) lsSet('mdk-cart-'+S.shop.slug, S.cart); };
+const cartCount = () => Object.values(S.cart).reduce((a,b)=>a+b,0);
+const cartTotal = () => S.shopProducts.reduce((a,p)=>a+(S.cart[p.id]||0)*Number(p.price),0);
+
+/* ---------- umumiy bo'laklar ---------- */
+function header(){
+  const right = S.user
+    ? `<div class="actions"><button class="btn sm" data-a="panel">${IC.cog(16)} Panel</button>${S.isAdmin?`<button class="btn sm ghost" data-a="admin">${IC.shield(16)} Admin</button>`:''}<button class="btn sm ghost" data-a="logout">Chiqish</button></div>`
+    : `<div class="actions"><button class="btn sm ghost" data-a="login">Kirish</button><button class="btn sm primary" data-a="signup">Boshlash</button></div>`;
+  return `<div class="top"><div class="in"><a class="logo" data-a="home"><div class="mark">${IC.store(19)}</div><span class="t">MiniDokon</span></a>
+    <div class="nav"><a class="l" data-a="scroll" data-v="imkon">Imkoniyatlar</a><a class="l" data-a="scroll" data-v="tarif">Tariflar</a><a class="l" data-a="scroll" data-v="savol">Savollar</a></div>${right}</div></div>`;
+}
+const li = t => `<li>${IC.check(18)}<span>${t}</span></li>`;
+const imgBox = (p, size) => p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.name)}" loading="lazy">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${grad(p.name)}">${IC.image(size||34)}</div>`;
+
+/* ---------- bosh sahifa ---------- */
+function viewHome(){
+  const tile = (n,pr,c) => `<div class="tile"><div class="im" style="background:${c}">${IC.bag(26)}</div><div class="tx"><b>${n}</b><span>${pr}</span></div></div>`;
+  return header() + `<div class="wrap">
+  <section class="hero">
+    <div>
+      <div class="eyebrow"><i>${IC.zap(12)}</i> Instagram va Telegram sotuvchilari uchun</div>
+      <h1>Do'koningiz endi <em>havola</em> ko'rinishida</h1>
+      <p class="lead">Mahsulotlaringizni rasm va narx bilan qo'shing, shaxsiy do'kon havolangizni oling. Mijoz buyurtma beradi, siz panelda ko'rasiz va Telegramda bog'lanasiz.</p>
+      <div class="cta"><button class="btn primary lg" data-a="signup">Bepul do'kon ochish ${IC.arrow(18)}</button><button class="btn lg" data-a="scroll" data-v="qanday">Qanday ishlaydi</button></div>
+      <div class="trust"><span>${IC.check(16)} Karta shart emas</span><span>${IC.check(16)} 5 daqiqada tayyor</span><span>${IC.check(16)} Telefondan boshqariladi</span></div>
+    </div>
+    <div style="position:relative">
+      <div class="phone"><div class="tag"><i></i> Namuna do'kon</div>
+        <div class="scr"><div class="bar"><div class="av">M</div><div><b>Malika Kiyim</b><small>minidokon.uz/malika-kiyim</small></div></div>
+          <div class="tiles">${tile("Ko'ylak","189 000 so'm","linear-gradient(135deg,#0a8f63,#7ad9b6)")}${tile("Sumka","245 000 so'm","linear-gradient(135deg,#1f5f8b,#7fb7e0)")}${tile("Ro'mol","79 000 so'm","linear-gradient(135deg,#8a3b6e,#e39ac4)")}${tile("Tufli","320 000 so'm","linear-gradient(135deg,#a8672b,#f0c48a)")}</div>
+          <div class="order"><span>Savat: 2 ta mahsulot</span><span>434 000 so'm</span></div></div></div>
+    </div>
+  </section>
+
+  <div class="strip">
+    <div><b>5 daqiqa</b><span>do'kon ochish uchun</span></div>
+    <div><b>0 so'm</b><span>boshlash narxi</span></div>
+    <div><b>24/7</b><span>mijozlar buyurtma beradi</span></div>
+    <div><b>1 havola</b><span>bio va kanalingiz uchun</span></div>
+  </div>
+
+  <section class="section" id="imkon">
+    <div class="head"><div class="kicker">Imkoniyatlar</div><h2>Sotish uchun kerakli hamma narsa</h2><p>Murakkab sozlamalar yo'q. Faqat siz va mijozingiz o'rtasidagi eng qisqa yo'l.</p></div>
+    <div class="feat">
+      <div class="f"><div class="ic">${IC.smart(22)}</div><h3>Telefonga mos</h3><p>Sayt barcha ekranlarda chiroyli ochiladi. Mijozlaringizning ko'pi telefondan kiradi.</p></div>
+      <div class="f"><div class="ic">${IC.bag(22)}</div><h3>Savat va buyurtma</h3><p>Mijoz bir nechta mahsulotni savatga yig'ib, bitta buyurtma beradi.</p></div>
+      <div class="f"><div class="ic">${IC.send(22)}</div><h3>Telegram bilan bog'lanish</h3><p>Buyurtmadan keyin mijoz tayyor xabar bilan to'g'ridan-to'g'ri sizga yozadi.</p></div>
+      <div class="f"><div class="ic">${IC.chart(22)}</div><h3>Buyurtmalar paneli</h3><p>Yangi, bajarilgan va bekor qilingan buyurtmalar bir joyda, hech biri yo'qolmaydi.</p></div>
+      <div class="f"><div class="ic">${IC.image(22)}</div><h3>Rasm avtomatik kichrayadi</h3><p>Telefondagi katta rasm ham tez ochiladi, trafik va vaqt tejaladi.</p></div>
+      <div class="f"><div class="ic">${IC.shield(22)}</div><h3>Ma'lumotlar himoyada</h3><p>Do'kon ma'lumotlarini faqat o'zingiz o'zgartira olasiz. Buyurtmalarni faqat siz ko'rasiz.</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="qanday">
+    <div class="head"><div class="kicker">Qanday ishlaydi</div><h2>To'rt qadamda sotuvni boshlang</h2></div>
+    <div class="how">
+      <div class="s"><div class="n">1</div><h3>Ro'yxatdan o'ting</h3><p>Email va parol yetarli.</p></div>
+      <div class="s"><div class="n">2</div><h3>Do'kon yarating</h3><p>Nom, havola manzili va Telegram username kiriting.</p></div>
+      <div class="s"><div class="n">3</div><h3>Mahsulot qo'shing</h3><p>Rasm tanlang, nom va narxni yozing.</p></div>
+      <div class="s"><div class="n">4</div><h3>Havolani ulashing</h3><p>Instagram bio va Telegram kanalingizga joylang.</p></div>
+    </div>
+  </section>
+
+  <section class="section" id="tarif">
+    <div class="head"><div class="kicker">Tariflar</div><h2>Oddiy va ochiq narxlar</h2><p>Bepul boshlang. Mahsulotlaringiz ko'payganda Pro tarifga o'ting.</p></div>
+    <div class="plans">
+      <div class="plan"><h3>Bepul</h3><div class="pr">0 <small>so'm</small></div><ul>${li(FREE_LIMIT+' tagacha mahsulot')}${li("Shaxsiy do'kon havolasi")}${li('Savat va buyurtmalar paneli')}${li('Rasm yuklash')}</ul><button class="btn block" data-a="signup">Bepul boshlash</button></div>
+      <div class="plan pro"><span class="badge-gold">Tavsiya etiladi</span><h3>Pro</h3><div class="pr">${money(PRO_PRICE).replace(" so'm","")} <small>so'm / oy</small></div><ul>${li('Cheksiz mahsulot')}${li('Bepul tarifdagi hamma narsa')}${li('Ustuvor yordam')}${li('Yangi imkoniyatlarga birinchi kirish')}</ul><button class="btn gold block" data-a="signup">Pro bilan boshlash</button></div>
+    </div>
+  </section>
+
+  <section class="section" id="savol" style="max-width:760px">
+    <div class="head"><div class="kicker">Savollar</div><h2>Ko'p so'raladigan savollar</h2></div>
+    <details class="q"><summary>Mijozlar ro'yxatdan o'tishi kerakmi? ${IC.plus(18)}</summary><p>Yo'q. Mijoz havolani ochadi, mahsulotni tanlaydi, ism va telefon raqamini yozadi. Boshqa hech narsa kerak emas.</p></details>
+    <details class="q"><summary>Pul to'lovi qanday o'tadi? ${IC.plus(18)}</summary><p>Mijoz bilan to'lov usulini o'zingiz kelishasiz: naqd, karta orqali o'tkazma yoki yetkazib berishda. Platforma mijoz to'lovidan foiz olmaydi.</p></details>
+    <details class="q"><summary>Pro tarifga qanday o'taman? ${IC.plus(18)}</summary><p>Panelning Sozlamalar bo'limida "Pro sotib olish" tugmasini bosing, tarifni tanlang, kartaga to'lang va chek rasmini yuklang. Tasdiqlangach tarif avtomatik yoqiladi.</p></details>
+    <details class="q"><summary>Havolani qayerga qo'yaman? ${IC.plus(18)}</summary><p>Instagram profilingizdagi havola maydoniga, Telegram kanal tavsifiga yoki to'g'ridan-to'g'ri mijozlarga yuborishingiz mumkin.</p></details>
+  </section>
+
+  <div class="banner"><h2>Birinchi mahsulotingizni bugun joylang</h2><button class="btn primary lg" data-a="signup">Do'kon ochish ${IC.arrow(18)}</button></div>
+  <div class="foot"><span>MiniDokon, O'zbekiston sotuvchilari uchun</span><a data-a="signup">Boshlash</a></div></div>`;
+}
+
+function viewAuth(){
+  const login = S.authMode==='login';
+  return header() + `<div class="wrap"><div class="card auth">
+    <h2>${login?'Qaytganingiz bilan':"Do'kon ochish"}</h2><p class="sub">${login?'Hisobingizga kiring.':"Email va parol bilan bepul ro'yxatdan o'ting."}</p>
+    <form class="form" id="authForm">
+      <label class="f">Email<input type="email" name="email" required autocomplete="email" placeholder="siz@mail.com"></label>
+      <label class="f">Parol<input type="password" name="password" required minlength="6" autocomplete="${login?'current-password':'new-password'}" placeholder="Kamida 6 belgi"></label>
+      <button class="btn primary lg block" type="submit">${login?'Kirish':"Ro'yxatdan o'tish"}</button>
+      <div id="authMsg"></div>
+    </form>
+    <p style="margin-top:16px;color:var(--mute);font-size:14.5px;text-align:center">${login?"Hisobingiz yo'qmi?":"Hisobingiz bormi?"} <a href="#" data-a="${login?'signup':'login'}" style="color:var(--brand);font-weight:800;text-decoration:none">${login?"Ro'yxatdan o'ting":'Kiring'}</a></p>
+  </div></div>`;
+}
+
+function viewCreateStore(){
+  return header() + `<div class="wrap"><div class="card auth" style="max-width:540px">
+    <h2>Do'koningizni yarating</h2><p class="sub">Bu ma'lumotlarni keyin Sozlamalardan o'zgartirasiz.</p>
+    <form class="form" id="storeForm">
+      <label class="f">Do'kon nomi<input type="text" name="name" required minlength="2" maxlength="60" placeholder="Masalan: Malika Kiyim"></label>
+      <label class="f">Havola manzili <span class="h">faqat kichik lotin harflari, raqam va chiziqcha</span>
+        <div class="prefix"><span>#/s/</span><input type="text" name="slug" required minlength="3" maxlength="30" pattern="[a-z0-9\\-]{3,30}" placeholder="malika-kiyim" autocapitalize="none" autocomplete="off"></div></label>
+      <label class="f">Telegram username <span class="h">buyurtmalar shu akkauntga yo'naltiriladi</span>
+        <div class="prefix"><span>@</span><input type="text" name="telegram" placeholder="username" autocapitalize="none" autocomplete="off"></div></label>
+      <label class="f">Telefon raqam<input type="tel" name="phone" placeholder="+998 90 123 45 67"></label>
+      <label class="f">Qisqacha tavsif<textarea name="description" maxlength="300" placeholder="Nima sotasiz, qayerga yetkazib berasiz"></textarea></label>
+      <button class="btn primary lg block" type="submit">Do'konni ochish</button>
+      <div id="storeMsg"></div>
+    </form></div></div>`;
+}
+
+/* ---------- panel ---------- */
+function viewPanel(){
+  const st = S.store, pro = isPro(st);
+  const newCount = S.orders.filter(o=>o.status==='new').length;
+  const tab = (k,ic,t,b) => `<button class="${S.tab===k?'on':''}" data-a="tab" data-v="${k}">${ic} ${t}${b?`<span class="badge">${b}</span>`:''}</button>`;
+  let body='';
+  if (S.tab==='products') body = panelProducts();
+  if (S.tab==='orders') body = panelOrders();
+  if (S.tab==='settings') body = panelSettings();
+  const tgShare = `https://t.me/share/url?url=${encodeURIComponent(shopUrl(st.slug))}&text=${encodeURIComponent(st.name)}`;
+  return header() + `<div class="wrap" style="padding-bottom:60px">
+    <div class="dash-head"><div><h1>${esc(st.name)}</h1><span class="pill ${pro?'pro':''}">${pro?'Pro, '+esc(st.plan_until)+' gacha':'Bepul tarif'}</span></div></div>
+    <div class="linkbox"><div class="u">${IC.link(18)}<span>${esc(shopUrl(st.slug))}</span></div>
+      <div class="bt"><button class="btn sm" data-a="copy">${IC.copy(15)} Nusxalash</button><a class="btn sm" target="_blank" rel="noopener" href="${tgShare}">${IC.share(15)} Ulashish</a><button class="btn sm primary" data-a="open">${IC.ext(15)} Ochish</button></div></div>
+    <div class="stats"><div class="stat"><small>Mahsulotlar</small><b>${S.products.length}${pro?'':'<span style="font-size:15px;color:var(--mute)"> / '+FREE_LIMIT+'</span>'}</b></div>
+      <div class="stat ${newCount?'hot':''}"><small>Yangi buyurtma</small><b>${newCount}</b></div><div class="stat"><small>Jami buyurtma</small><b>${S.orders.length}</b></div></div>
+    <div class="seg">${tab('products',IC.box(17),'Mahsulotlar')}${tab('orders',IC.bag(17),'Buyurtmalar',newCount||'')}${tab('settings',IC.cog(17),'Sozlamalar')}</div>
+    ${body}</div>${S.editing?prodModal():''}${S.payOpen?payModal():''}`;
+}
+
+function panelProducts(){
+  const pro = isPro(S.store);
+  const limitHit = !pro && S.products.length >= FREE_LIMIT;
+  const list = S.products.length ? `<div class="grid">${S.products.map(p=>`
+    <div class="prod ${p.active?'':'off'}"><div class="im" data-a="edit" data-id="${p.id}">${imgBox(p)}${p.active?'':'<span class="flag">Yashirin</span>'}</div>
+    <div class="bd"><div class="nm">${esc(p.name)}</div><div class="pc">${money(p.price)}</div></div>
+    <div class="ac"><button class="btn sm icon-btn" data-a="edit" data-id="${p.id}" aria-label="Tahrirlash" title="Tahrirlash">${IC.edit(16)}</button>
+    <button class="btn sm icon-btn" data-a="toggle" data-id="${p.id}" aria-label="${p.active?'Yashirish':"Ko'rsatish"}" title="${p.active?'Yashirish':"Ko'rsatish"}">${p.active?IC.eyeoff(16):IC.eye(16)}</button>
+    <button class="btn sm icon-btn danger" data-a="del" data-id="${p.id}" aria-label="O'chirish" title="O'chirish">${IC.trash(16)}</button></div></div>`).join('')}</div>`
+    : `<div class="empty">${IC.box(40)}<b>Hali mahsulot yo'q</b>Birinchi mahsulotingizni qo'shing, u darhol do'koningizda ko'rinadi.</div>`;
+  return `<div class="toolbar"><span class="cnt">${S.products.length} ta mahsulot</span>
+    <button class="btn primary" data-a="addprod" ${limitHit?'disabled':''}>${IC.plus(18)} Mahsulot qo'shish</button></div>
+    ${limitHit?`<div class="msg err" style="margin-bottom:14px">Bepul limit tugadi. Cheksiz mahsulot uchun Sozlamalar bo'limidan Pro tarifga o'ting.</div>`:''}${list}`;
+}
+
+function panelOrders(){
+  if (!S.orders.length) return `<div class="empty">${IC.bag(40)}<b>Hali buyurtma yo'q</b>Do'kon havolangizni ulashing. Buyurtmalar shu yerda paydo bo'ladi.</div>`;
+  const stl = {new:'Yangi',done:'Bajarildi',cancelled:'Bekor qilindi'};
+  return S.orders.map(o=>`<div class="card order" style="box-shadow:none"><div class="toolbar" style="margin:0"><b>${esc(o.product_name)} <span style="color:var(--mute)">x ${o.qty}</span></b><span class="st ${o.status}">${stl[o.status]}</span></div>
+    <div>${esc(o.customer_name)}, <a class="ph" href="tel:${esc(o.customer_phone)}">${esc(o.customer_phone)}</a></div>
+    ${o.note?`<div class="meta">Izoh: ${esc(o.note)}</div>`:''}
+    <div class="meta">${new Date(o.created_at).toLocaleString('ru-RU')}</div>
+    ${o.status==='new'?`<div style="display:flex;gap:8px"><button class="btn sm primary" data-a="ostat" data-id="${o.id}" data-v="done">${IC.check(15)} Bajarildi</button><button class="btn sm" data-a="ostat" data-id="${o.id}" data-v="cancelled">Bekor qilish</button></div>`:''}</div>`).join('');
+}
+
+function panelSettings(){
+  const st=S.store, pro=isPro(st);
+  return `<div class="card"><form class="form" id="setForm">
+    <label class="f">Do'kon nomi<input type="text" name="name" required value="${esc(st.name)}" maxlength="60"></label>
+    <label class="f">Telegram username<div class="prefix"><span>@</span><input type="text" name="telegram" value="${esc(st.telegram)}" autocapitalize="none"></div></label>
+    <label class="f">Telefon<input type="tel" name="phone" value="${esc(st.phone)}"></label>
+    <label class="f">Tavsif<textarea name="description" maxlength="300">${esc(st.description)}</textarea></label>
+    <button class="btn primary" type="submit">Saqlash</button><div id="setMsg"></div></form></div>
+    ${proBlock(st,pro)}`;
+}
+
+function proBlock(st,pro){
+  const pend = S.payments.find(p=>p.status==='pending');
+  const last = S.payments[0];
+  let info='', btn='';
+  if (pend){
+    info = `To'lovingiz tekshirilmoqda (${pend.months} oy, ${money(pend.amount)}). Tasdiqlangach Pro avtomatik yoqiladi.`;
+    btn = `<button class="btn" data-a="refresh">Holatni yangilash</button>`;
+  } else {
+    info = pro ? `Amal qilish muddati: <b>${esc(st.plan_until)}</b>` : `Cheksiz mahsulot. Oyiga ${money(PLANS[0].price)} dan.`;
+    if (last && last.status==='rejected') info += `<div class="msg err" style="margin-top:10px">So'nggi to'lov tasdiqlanmadi. Chekni tekshirib, qayta yuboring.</div>`;
+    btn = `<button class="btn gold" data-a="buy">${IC.card(17)} ${pro?'Muddatni uzaytirish':'Pro sotib olish'}</button>`;
+  }
+  return `<div class="plan pro" style="margin-top:14px"><span class="badge-gold">Pro tarif</span><h3>${pro?'Pro tarif faol':'Cheksiz mahsulot'}</h3><p style="color:var(--ink-2);margin:6px 0 14px">${info}</p>${btn}</div>`;
+}
+function payModal(){
+  const hd = `<div class="hd"><h3>Pro tarif</h3><button class="btn sm icon-btn ghost" data-a="closemodal" aria-label="Yopish">${IC.x(20)}</button></div>`;
+  if (!payCard()) return `<div class="modal" data-a="closemodal"><div class="sheet" data-stop="1">${hd}<div class="empty">${IC.card(40)}<b>To'lov hali ulanmagan</b>Platforma egasi karta ma'lumotlarini kiritgach, bu yerdan sotib olish mumkin bo'ladi.</div></div></div>`;
+  const plan = PLANS.find(p=>p.m===S.payMonths) || PLANS[0];
+  const opts = PLANS.map(p=>`<button type="button" class="${p.m===plan.m?'on':''}" data-a="paymonths" data-v="${p.m}">${p.label}</button>`).join('');
+  return `<div class="modal" data-a="closemodal"><div class="sheet" data-stop="1">${hd}
+    <div class="seg" style="margin-top:0">${opts}</div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="color:var(--mute);font-weight:600">To'lov summasi</span><b style="font-family:var(--font-display);font-size:26px;letter-spacing:-.02em">${money(plan.price)}</b></div>
+    <div class="paycard"><small>Karta raqami</small><div class="num">${esc(payCard())}</div>
+      <div class="row2"><div>${payHolder()?`<small>Karta egasi</small><b>${esc(payHolder())}</b>`:''}</div><button class="btn sm" type="button" data-a="copycard">${IC.copy(15)} Nusxalash</button></div></div>
+    <form class="form" id="payForm">
+      <p style="color:var(--ink-2);font-size:14.5px">Shu summani kartaga o'tkazing, so'ng chek rasmini yuklang. Tekshirilgach Pro tarif yoqiladi.</p>
+      <label class="f">Chek rasmi <span class="h">to'lov ilovasidagi skrinshot</span><input type="file" name="receipt" accept="image/*" required></label>
+      <button class="btn gold lg block" type="submit">${IC.upload(18)} To'lovni yubordim</button>
+      <div id="payMsg"></div></form></div></div>`;
+}
+const fmtD = d => d ? new Date(d).toLocaleDateString('ru-RU') : '-';
+const fmtDT = d => d ? new Date(d).toLocaleString('ru-RU',{dateStyle:'short',timeStyle:'short'}) : 'Hali kirmagan';
+const nfmt = n => Number(n||0).toLocaleString('ru-RU').replace(/ /g,' ');
+
+function viewAdminLogin(){
+  return `<div class="wrap"><div class="card auth" style="margin-top:12vh">
+    <div class="logo" style="margin-bottom:18px"><div class="mark">${IC.shield(19)}</div><span class="t">MiniDokon Admin</span></div>
+    <h2>Admin kirish</h2><p class="sub">Faqat platforma egasi uchun.</p>
+    <form class="form" id="adminLoginForm">
+      <label class="f">Email<input type="email" name="email" required autocomplete="username" placeholder="admin@gmail.com"></label>
+      <label class="f">Parol<input type="password" name="password" required autocomplete="current-password"></label>
+      <button class="btn primary lg block" type="submit">Kirish</button>
+      <div id="admMsg">${S.admErr?`<div class="msg err">${esc(S.admErr)}</div>`:''}</div>
+    </form>
+    <p style="margin-top:16px;text-align:center;font-size:14.5px"><a href="#/" data-a="home" style="color:var(--brand);font-weight:800;text-decoration:none">Saytga qaytish</a></p>
+  </div></div>`;
+}
+
+function signupBars(users){
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = [];
+  for (let i=13;i>=0;i--){ const d=new Date(today); d.setDate(d.getDate()-i); days.push({ d, n:0 }); }
+  users.forEach(u=>{ const t=new Date(u.created_at); t.setHours(0,0,0,0); const x=days.find(k=>k.d.getTime()===t.getTime()); if (x) x.n++; });
+  const max = Math.max(1, ...days.map(k=>k.n));
+  return `<div class="bars">${days.map(k=>`<div class="b" title="${esc(k.d.toLocaleDateString('ru-RU'))}: ${k.n}"><span>${k.n||''}</span><i style="height:${k.n?Math.max(6,Math.round(k.n/max*100)):3}px;${k.n?'':'opacity:.3'}"></i></div>`).join('')}</div>
+    <div class="toolbar" style="margin:8px 0 0"><span class="cnt">${esc(days[0].d.toLocaleDateString('ru-RU'))}</span><span class="cnt">Bugun</span></div>`;
+}
+
+function admOverview(A, st, pend){
+  const tile = (l,v,sub,hot,small) => `<div class="stat ${hot?'hot':''}"><small>${l}</small><b${small?' style="font-size:20px;padding-top:4px"':''}>${v}</b>${sub?`<small>${sub}</small>`:''}</div>`;
+  const recent = A.users.slice(0,6).map(u=>`<div class="line"><div class="tx"><b>${esc(u.email)}</b><small style="color:var(--mute);font-weight:600">${u.store_name?esc(u.store_name):"Do'kon ochmagan"}</small></div><span class="meta" style="color:var(--mute);font-size:13px">${fmtD(u.created_at)}</span></div>`).join('');
+  return `${pend.length?`<div class="linkbox" style="margin-bottom:14px;background:var(--gold-soft);border-color:var(--gold)"><div class="u" style="color:var(--gold)">${IC.card(18)}<span>${pend.length} ta to'lov tasdiqlashni kutmoqda</span></div><button class="btn sm gold" data-a="admtab" data-v="pay">Ko'rish</button></div>`:''}
+    <div class="stats s4">${tile('Foydalanuvchilar',nfmt(st.users),'+'+nfmt(st.new_users_7d)+' oxirgi 7 kun')}${tile("Do'konlar",nfmt(st.stores))}${tile("Pro do'konlar",nfmt(st.pro))}${tile('Mahsulotlar',nfmt(st.products))}
+      ${tile('Buyurtmalar',nfmt(st.orders))}${tile('Kutilayotgan to\'lov',nfmt(st.pending),'',st.pending>0)}${tile('Jami daromad',money(st.revenue),'',false,true)}${tile('30 kunlik daromad',money(st.revenue_30d),'',false,true)}</div>
+    <div class="card" style="margin-bottom:14px"><h3 style="margin-bottom:4px">Yangi foydalanuvchilar</h3><p style="color:var(--mute);font-size:14px;margin-bottom:14px">Oxirgi 14 kun, har kuni nechta kishi ro'yxatdan o'tgan</p>${signupBars(A.users)}</div>
+    <div class="card"><h3 style="margin-bottom:6px">Oxirgi ro'yxatdan o'tganlar</h3>${recent||`<div class="empty" style="border:0">Hali foydalanuvchi yo'q.</div>`}</div>`;
+}
+
+function usersTable(){
+  const q = S.admQ.trim().toLowerCase();
+  const rows = (S.adm?S.adm.users:[]).filter(u=>!q || [u.email,u.store_name,u.slug].some(v=>String(v||'').toLowerCase().includes(q)));
+  if (!rows.length) return `<div class="empty">${IC.user(40)}<b>Hech kim topilmadi</b>Boshqa so'z bilan qidirib ko'ring.</div>`;
+  return `<div class="tblw"><table class="tbl"><thead><tr><th>Email</th><th>Do'kon</th><th>Tarif</th><th>Mahsulot</th><th>Buyurtma</th><th>Ro'yxatdan o'tgan</th><th>Oxirgi kirish</th></tr></thead><tbody>${rows.map(u=>`<tr>
+    <td><b>${esc(u.email)}</b>${u.is_admin?' <span class="pill pro">Admin</span>':''}</td>
+    <td>${u.store_id?`<a href="#/s/${esc(u.slug)}" style="color:var(--brand-2);font-weight:700">${esc(u.store_name)}</a>`:`<span style="color:var(--mute)">Do'kon ochmagan</span>`}</td>
+    <td>${u.store_id?`<span class="pill ${isPro(u)?'pro':''}">${isPro(u)?'Pro, '+esc(u.plan_until):'Bepul'}</span>`:'-'}</td>
+    <td>${u.store_id?nfmt(u.products):'-'}</td><td>${u.store_id?nfmt(u.orders):'-'}</td>
+    <td>${fmtD(u.created_at)}</td><td>${fmtDT(u.last_sign_in_at)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+function storesList(){
+  const q = S.admQ.trim().toLowerCase();
+  const rows = (S.adm?S.adm.users:[]).filter(u=>u.store_id && (!q || [u.store_name,u.slug,u.email].some(v=>String(v||'').toLowerCase().includes(q))));
+  if (!rows.length) return `<div class="empty">${IC.store(40)}<b>Do'kon topilmadi</b>Hali do'kon ochilmagan yoki qidiruv mos kelmadi.</div>`;
+  return rows.map(u=>{
+    const pro = isPro(u);
+    const del = S.admConfirm===u.store_id
+      ? `<span style="color:var(--danger);font-weight:700;font-size:13.5px">Aniq o'chirilsinmi? Mahsulot va buyurtmalari ham o'chadi.</span><button class="btn sm danger" data-a="delyes" data-id="${u.store_id}">Ha, o'chirish</button><button class="btn sm" data-a="delno">Yo'q</button>`
+      : `<button class="btn sm danger" data-a="delstore" data-id="${u.store_id}">${IC.trash(15)} O'chirish</button>`;
+    return `<div class="card order" style="box-shadow:none"><div class="toolbar" style="margin:0"><div style="min-width:0"><b>${esc(u.store_name)}</b><div class="meta">${esc(u.email)}</div></div><span class="pill ${pro?'pro':''}">${pro?'Pro, '+esc(u.plan_until)+' gacha':'Bepul'}</span></div>
+      <div class="meta"><a href="#/s/${esc(u.slug)}" style="color:var(--brand-2);font-weight:700">${esc(u.slug)}</a>, ${nfmt(u.products)} ta mahsulot, ${nfmt(u.orders)} ta buyurtma, ochilgan ${fmtD(u.store_created)}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn sm gold" data-a="setpro" data-id="${u.store_id}" data-v="1">Pro +1 oy</button><button class="btn sm gold" data-a="setpro" data-id="${u.store_id}" data-v="3">+3 oy</button><button class="btn sm gold" data-a="setpro" data-id="${u.store_id}" data-v="12">+12 oy</button>
+        ${pro?`<button class="btn sm" data-a="setpro" data-id="${u.store_id}" data-v="0">Bepulga qaytarish</button>`:''}${del}</div></div>`;
+  }).join('');
+}
+
+function admPayments(A){
+  const stl = { pending:'Kutilmoqda', approved:'Tasdiqlandi', rejected:'Rad etildi' };
+  if (!A.payments.length) return `<div class="empty">${IC.card(40)}<b>Hali to'lov yo'q</b>Sotuvchilar Pro sotib olganda chek shu yerda ko'rinadi.</div>`;
+  return A.payments.map(p=>`<div class="card order" style="box-shadow:none"><div class="pay-row">${p.url?`<a class="rcpt" target="_blank" rel="noopener" href="${esc(p.url)}"><img src="${esc(p.url)}" alt="Chek"></a>`:'<div class="rcpt"></div>'}
+    <div style="flex:1;min-width:0"><div class="toolbar" style="margin:0"><b>${esc(p.mdk_stores?p.mdk_stores.name:"Do'kon")}</b><span class="st ${p.status==='approved'?'done':p.status==='rejected'?'cancelled':''}">${stl[p.status]||''}</span></div>
+    <div class="meta">${p.months} oy, ${money(p.amount)}</div><div class="meta">${fmtDT(p.created_at)}</div></div></div>
+    ${p.status==='pending'?`<div style="display:flex;gap:8px"><button class="btn sm primary" data-a="approve" data-id="${p.id}">${IC.check(15)} Tasdiqlash</button><button class="btn sm danger" data-a="reject" data-id="${p.id}">Rad etish</button></div>`:''}</div>`).join('');
+}
+
+function admSettings(){
+  return `<div class="card"><h3 style="margin-bottom:4px">To'lov kartasi</h3><p style="color:var(--mute);font-size:14px;margin-bottom:14px">Sotuvchilar Pro uchun shu kartaga pul o'tkazadi. O'zgartirsangiz, saytda darhol yangilanadi.</p>
+    <form class="form" id="cardForm">
+      <label class="f">Karta raqami<input type="text" name="card" required inputmode="numeric" maxlength="23" value="${esc(payCard())}" placeholder="8600 0000 0000 0000"></label>
+      <label class="f">Karta egasi <span class="h">ixtiyoriy</span><input type="text" name="holder" maxlength="60" value="${esc(payHolder())}"></label>
+      <button class="btn primary" type="submit">Saqlash</button><div id="cardMsg"></div></form></div>
+    <div class="card" style="margin-top:14px"><h3 style="margin-bottom:4px">Parolni almashtirish</h3><p style="color:var(--mute);font-size:14px;margin-bottom:14px">Hisob: <b>${esc(S.user.email||'')}</b>. Kamida 8 belgi, harf va raqamni aralashtiring.</p>
+    <form class="form" id="pwForm">
+      <label class="f">Yangi parol<input type="password" name="p1" required minlength="8" autocomplete="new-password"></label>
+      <label class="f">Yangi parolni takrorlang<input type="password" name="p2" required minlength="8" autocomplete="new-password"></label>
+      <button class="btn primary" type="submit">Parolni almashtirish</button><div id="pwMsg"></div></form></div>
+    <div style="margin-top:14px"><button class="btn block" data-a="admlogout">Hisobdan chiqish</button></div>`;
+}
+
+function viewAdmin(){
+  if (!S.user || !S.isAdmin) return viewAdminLogin();
+  const A = S.adm || { payments:[], stats:{}, users:[] };
+  const st = A.stats || {};
+  const pend = A.payments.filter(p=>p.status==='pending');
+  const tab = (k,ic,t,b) => `<button class="${S.admTab===k?'on':''}" data-a="admtab" data-v="${k}">${ic} ${t}${b?`<span class="badge">${b}</span>`:''}</button>`;
+  const search = (id,ph) => `<div class="search" style="margin-top:0"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input type="search" id="${id}" placeholder="${ph}" value="${esc(S.admQ)}" autocomplete="off"></div>`;
+  let body = '';
+  if (S.admTab==='over') body = admOverview(A, st, pend);
+  else if (S.admTab==='users') body = search('uq','Email, do\'kon nomi yoki manzil bo\'yicha qidirish') + `<div id="utbl">${usersTable()}</div>`;
+  else if (S.admTab==='stores') body = search('sq','Do\'kon yoki email bo\'yicha qidirish') + `<div id="stlist">${storesList()}</div>`;
+  else if (S.admTab==='pay') body = admPayments(A);
+  else body = admSettings();
+  return `<div class="top"><div class="in"><a class="logo" data-a="admtab" data-v="over"><div class="mark">${IC.shield(19)}</div><span class="t">MiniDokon Admin</span></a>
+      <div class="actions"><button class="btn sm ghost adm-hide" data-a="home">Saytni ko'rish</button><button class="btn sm" data-a="admlogout">Chiqish</button></div></div></div>
+    <div class="wrap" style="padding-bottom:60px">${S.admWarn?`<div class="msg err" style="margin-top:16px">${esc(S.admWarn)}</div>`:''}
+    <div class="dash-head"><div><h1>Boshqaruv paneli</h1><span class="pill pro">${esc(S.user.email||'Admin')}</span></div></div>
+    <div class="seg">${tab('over',IC.chart(17),'Umumiy')}${tab('users',IC.user(17),'Foydalanuvchilar')}${tab('stores',IC.store(17),"Do'konlar")}${tab('pay',IC.card(17),"To'lovlar",pend.length||'')}${tab('set',IC.cog(17),'Sozlamalar')}</div>
+    ${body}</div>`;
+}
+
+/* ---------- ochiq do'kon ---------- */
+function shopGridHtml(){
+  const q = S.q.trim().toLowerCase();
+  const list = S.shopProducts.filter(p=>!q || p.name.toLowerCase().includes(q));
+  if (!S.shopProducts.length) return `<div class="empty">${IC.box(40)}<b>Hozircha mahsulot yo'q</b>Tez orada yangi mahsulotlar qo'shiladi.</div>`;
+  if (!list.length) return `<div class="empty">${IC.search(40)}<b>Hech narsa topilmadi</b>Boshqa so'z bilan qidirib ko'ring.</div>`;
+  return `<div class="grid">${list.map(p=>`
+    <div class="prod"><div class="im" data-a="detail" data-id="${p.id}">${imgBox(p)}</div>
+    <div class="bd" data-a="detail" data-id="${p.id}" style="cursor:pointer"><div class="nm">${esc(p.name)}</div><div class="pc">${money(p.price)}</div></div>
+    <div class="ac"><button class="btn sm primary" style="flex:1" data-a="add" data-id="${p.id}">${IC.plus(16)} Savatga</button></div></div>`).join('')}</div>`;
+}
+function viewShop(){
+  const st = S.shop;
+  if (!st) return header() + `<div class="wrap"><div class="empty" style="margin-top:60px">${IC.search(40)}<b>Bunday do'kon topilmadi</b>Havola noto'g'ri yoki do'kon o'chirilgan.<br><br><button class="btn primary" data-a="home">Bosh sahifa</button></div></div>`;
+  const tg = cleanTg(st.telegram);
+  const chips = [
+    tg?`<a class="chip" target="_blank" rel="noopener" href="https://t.me/${esc(tg)}">${IC.send(16)} @${esc(tg)}</a>`:'',
+    st.phone?`<a class="chip" href="tel:${esc(st.phone)}">${IC.phone(16)} ${esc(st.phone)}</a>`:'',
+    `<a class="chip" data-a="sharelink">${IC.share(16)} Ulashish</a>`
+  ].join('');
+  const n = cartCount();
+  return `<div class="top"><div class="in"><a class="logo" data-a="top"><div class="mark">${IC.store(19)}</div><span class="t">${esc(st.name)}</span></a>
+      ${n?`<button class="btn sm primary" data-a="cart">${IC.bag(16)} ${n}</button>`:'<span></span>'}</div></div>
+    <div class="wrap" style="padding-bottom:${n?'110px':'48px'}">
+    <div class="cover" style="background:${grad(st.name)}"><div class="ct"><div class="big">${esc(initial(st.name))}</div><div style="min-width:0"><h1>${esc(st.name)}</h1>${st.description?`<p>${esc(st.description)}</p>`:''}</div></div></div>
+    <div class="chips">${chips}</div>
+    <div class="search">${IC.search(19)}<input type="search" id="q" placeholder="Mahsulot qidirish" value="${esc(S.q)}" autocomplete="off"></div>
+    <div id="grid">${shopGridHtml()}</div>
+    <div class="foot"><span>Do'kon <a data-a="home">MiniDokon</a> orqali yaratilgan</span></div></div>
+    ${n?`<div class="cartbar"><div class="in" data-a="cart"><div><small>${n} ta mahsulot</small><b>${money(cartTotal())}</b></div><button class="go" type="button">Savatni ochish ${IC.arrow(17)}</button></div></div>`:''}
+    ${modalShop()}`;
+}
+function modalShop(){
+  if (S.orderDone) return orderDoneModal();
+  if (S.cartOpen) return cartModal();
+  if (S.detail) return detailModal(S.detail);
+  return '';
+}
+function qtyCtl(id,q){ return `<div class="qty"><button type="button" data-a="dec" data-id="${id}" aria-label="Kamaytirish">${IC.minus(16)}</button><span>${q}</span><button type="button" data-a="inc" data-id="${id}" aria-label="Ko'paytirish">${IC.plus(16)}</button></div>`; }
+function detailModal(p){
+  const q = S.cart[p.id]||0;
+  return `<div class="modal" data-a="closemodal"><div class="sheet" data-stop="1">
+    <div class="hd"><h3>${esc(p.name)}</h3><button class="btn sm icon-btn ghost" data-a="closemodal" aria-label="Yopish">${IC.x(20)}</button></div>
+    <div class="pimg">${imgBox(p,48)}</div>
+    <div style="font-family:var(--font-display);font-weight:800;font-size:26px;color:var(--brand-2);letter-spacing:-.02em;margin-bottom:8px">${money(p.price)}</div>
+    ${p.description?`<p style="color:var(--ink-2);margin-bottom:16px;white-space:pre-line">${esc(p.description)}</p>`:'<div style="height:8px"></div>'}
+    ${q?`<div style="display:flex;gap:12px;align-items:center;justify-content:space-between">${qtyCtl(p.id,q)}<button class="btn primary" data-a="cart">${IC.bag(17)} Savatga o'tish</button></div>`
+       :`<button class="btn primary lg block" data-a="add" data-id="${p.id}" data-keep="1">${IC.plus(18)} Savatga qo'shish</button>`}
+  </div></div>`;
+}
+function cartModal(){
+  const items = S.shopProducts.filter(p=>S.cart[p.id]);
+  if (!items.length) return `<div class="modal" data-a="closemodal"><div class="sheet" data-stop="1"><div class="hd"><h3>Savat</h3><button class="btn sm icon-btn ghost" data-a="closemodal" aria-label="Yopish">${IC.x(20)}</button></div><div class="empty">${IC.bag(40)}<b>Savat bo'sh</b>Mahsulot qo'shing.</div></div></div>`;
+  return `<div class="modal" data-a="closemodal"><div class="sheet" data-stop="1">
+    <div class="hd"><h3>Savat</h3><button class="btn sm icon-btn ghost" data-a="closemodal" aria-label="Yopish">${IC.x(20)}</button></div>
+    ${items.map(p=>`<div class="line"><div class="th">${imgBox(p,20)}</div><div class="tx"><b>${esc(p.name)}</b><small>${money(p.price)}</small></div>${qtyCtl(p.id,S.cart[p.id])}</div>`).join('')}
+    <div class="total"><span>Jami</span><b>${money(cartTotal())}</b></div>
+    <form class="form" id="orderForm">
+      <label class="f">Ismingiz<input type="text" name="customer_name" required minlength="2" maxlength="80" autocomplete="name"></label>
+      <label class="f">Telefon raqamingiz<input type="tel" name="customer_phone" required minlength="5" maxlength="30" placeholder="+998 90 123 45 67" autocomplete="tel"></label>
+      <label class="f">Izoh <span class="h">ixtiyoriy: o'lcham, rang, manzil</span><textarea name="note" maxlength="300"></textarea></label>
+      <button class="btn primary lg block" type="submit">Buyurtma berish</button>
+      <div id="ordMsg"></div></form></div></div>`;
+}
+function orderDoneModal(){
+  const d=S.orderDone, tg=cleanTg(S.shop.telegram);
+  const lines = d.items.map(i=>`${i.name} x ${i.qty}`).join(', ');
+  const txt = encodeURIComponent(`Assalomu alaykum! Buyurtma berdim: ${lines}. Jami: ${money(d.total)}. Ism: ${d.name}, tel: ${d.phone}`);
+  return `<div class="modal" data-a="closemodal"><div class="sheet" data-stop="1" style="text-align:center">
+    <div style="width:64px;height:64px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:flex;align-items:center;justify-content:center;margin:6px auto 14px">${IC.check(30)}</div>
+    <h3 style="margin-bottom:6px">Buyurtma qabul qilindi</h3>
+    <p style="color:var(--ink-2);margin-bottom:18px">Sotuvchi tez orada siz bilan bog'lanadi. Tezroq javob olish uchun Telegramda yozing.</p>
+    ${tg?`<a class="btn primary lg block" style="margin-bottom:10px" target="_blank" rel="noopener" href="https://t.me/${esc(tg)}?text=${txt}">${IC.send(18)} Telegramda yozish</a>`:''}
+    <button class="btn block" data-a="closemodal">Yopish</button></div></div>`;
+}
+function prodModal(){
+  const p = S.editing==='new' ? null : S.products.find(x=>x.id===S.editing);
+  return `<div class="modal" data-a="closemodal"><div class="sheet" data-stop="1">
+    <div class="hd"><h3>${p?'Mahsulotni tahrirlash':'Yangi mahsulot'}</h3><button class="btn sm icon-btn ghost" data-a="closemodal" aria-label="Yopish">${IC.x(20)}</button></div>
+    <form class="form" id="prodForm">
+      <label class="f">Rasm <span class="h">JPG yoki PNG, avtomatik kichraytiriladi</span><input type="file" name="img" accept="image/*"></label>
+      <img id="prev" class="imgprev" ${p&&p.image_url?`src="${esc(p.image_url)}"`:'style="display:none"'} alt="">
+      <label class="f">Nomi<input type="text" name="name" required maxlength="100" value="${esc(p?p.name:'')}"></label>
+      <label class="f">Narxi (so'm)<input type="number" name="price" required min="0" inputmode="numeric" value="${p?Number(p.price):''}"></label>
+      <label class="f">Tavsif <span class="h">ixtiyoriy: o'lcham, rang, material</span><textarea name="description" maxlength="300">${esc(p?p.description:'')}</textarea></label>
+      <button class="btn primary lg block" type="submit">Saqlash</button>
+      <div id="prodMsg"></div></form></div></div>`;
+}
+
+/* ---------- render va yo'naltirish ---------- */
+function render(){
+  const h = location.hash || '#/';
+  const active = document.activeElement && document.activeElement.id;
+  let html;
+  if (/^#\/s\/[a-z0-9-]+/.test(h)) html = viewShop();
+  else if (h.startsWith('#/admin')) html = viewAdmin();
+  else if (h.startsWith('#/auth')) html = viewAuth();
+  else if (h.startsWith('#/panel')){
+    if (!S.user) html = viewAuth();
+    else if (!S.store) html = viewCreateStore();
+    else html = viewPanel();
+  } else html = viewHome();
+  app.innerHTML = html;
+  if (active==='q'){ const q=document.getElementById('q'); if(q){ q.focus(); q.setSelectionRange(q.value.length,q.value.length); } }
+}
+async function route(){
+  const h = location.hash || '#/';
+  const mShop = h.match(/^#\/s\/([a-z0-9-]+)/);
+  S.editing=null; S.detail=null; S.cartOpen=false; S.orderDone=null; S.q=''; S.payOpen=false; S.admErr='';
+  if (mShop){ app.innerHTML='<div class="loader"><i></i></div>'; await loadShop(mShop[1]); document.title = S.shop ? S.shop.name : 'MiniDokon'; }
+  else { document.title='MiniDokon'; if (h.startsWith('#/panel') && S.user) await loadMine(); if (h.startsWith('#/admin') && S.user){ await checkAdmin(); if (S.isAdmin) await loadAdmin(); } }
+  if (h.startsWith('#/auth') && S.user) return go(S.isAdmin ? '#/admin' : '#/panel');
+  render(); window.scrollTo(0,0);
+}
+
+/* ---------- rasmni kichraytirish ---------- */
+function shrink(file, max=1000){
+  return new Promise((res,rej)=>{
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = ()=>{
+      const k = Math.min(1, max/Math.max(img.width,img.height));
+      const c = document.createElement('canvas'); c.width=Math.round(img.width*k); c.height=Math.round(img.height*k);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);
+      c.toBlob(b=> b?res(b):rej(new Error("Rasm o'qilmadi")), 'image/webp', .82);
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); rej(new Error("Rasm o'qilmadi")); };
+    img.src = url;
+  });
+}
+
+/* ---------- hodisalar ---------- */
+document.addEventListener('input', e=>{
+  if (e.target.id==='uq'){ S.admQ=e.target.value; const g=document.getElementById('utbl'); if (g) g.innerHTML=usersTable(); }
+  if (e.target.id==='sq'){ S.admQ=e.target.value; const g=document.getElementById('stlist'); if (g) g.innerHTML=storesList(); }
+  if (e.target.id==='q'){ S.q = e.target.value; const g=document.getElementById('grid'); if (g) g.innerHTML = shopGridHtml(); }
+});
+document.addEventListener('click', async e=>{
+  const el = e.target.closest('[data-a]');
+  if (!el) return;
+  if (el.classList.contains('modal') && e.target.closest('[data-stop]')) return;
+  const a = el.dataset.a, id = el.dataset.id;
+  if (el.tagName==='A' && !el.getAttribute('target')) e.preventDefault();
+  try{
+    if (a==='home') go('#/');
+    else if (a==='top') window.scrollTo({top:0,behavior:'smooth'});
+    else if (a==='scroll'){ if ((location.hash||'#/')!=='#/'){ go('#/'); await new Promise(r=>setTimeout(r,60)); } const t=document.getElementById(el.dataset.v); if(t) t.scrollIntoView({behavior:'smooth',block:'start'}); }
+    else if (a==='login'){ S.authMode='login'; go('#/auth'); render(); }
+    else if (a==='signup'){ S.authMode='signup'; if (S.user) go('#/panel'); else { go('#/auth'); render(); } }
+    else if (a==='panel') go('#/panel');
+    else if (a==='logout'){ await sb.auth.signOut(); S.user=null; S.store=null; go('#/'); }
+    else if (a==='tab'){ S.tab=el.dataset.v; render(); }
+    else if (a==='copy'){ const ok = await copyText(shopUrl(S.store.slug)); flash(ok ? 'Havola nusxalandi' : "Nusxalab bo'lmadi. Havolani bosib turib belgilang."); }
+    else if (a==='sharelink'){
+      const u = shopUrl(S.shop.slug);
+      if (navigator.share){ try{ await navigator.share({title:S.shop.name,url:u}); }catch(_){} }
+      else { const ok = await copyText(u); flash(ok ? 'Havola nusxalandi' : u); }
+    }
+    else if (a==='open') window.open(shopUrl(S.store.slug),'_blank');
+    else if (a==='addprod'){ S.editing='new'; render(); }
+    else if (a==='edit'){ S.editing=id; render(); }
+    else if (a==='closemodal'){ S.editing=null; S.detail=null; S.cartOpen=false; S.orderDone=null; S.payOpen=false; render(); }
+    else if (a==='buy'){ S.payOpen=true; render(); }
+    else if (a==='paymonths'){ S.payMonths=Number(el.dataset.v)||1; render(); }
+    else if (a==='copycard'){ const ok = await copyText(String(payCard()).replace(/\s/g,'')); flash(ok ? 'Karta raqami nusxalandi' : "Nusxalab bo'lmadi. Raqamni bosib turib belgilang."); }
+    else if (a==='refresh'){ await loadMine(); render(); flash('Yangilandi'); }
+    else if (a==='admin') go('#/admin');
+    else if (a==='admtab'){ if ((location.hash||'').startsWith('#/admin')){ S.admTab=el.dataset.v; S.admQ=''; S.admConfirm=null; render(); window.scrollTo(0,0); } }
+    else if (a==='admlogout'){ await sb.auth.signOut(); S.user=null; S.isAdmin=false; S.adm=null; S.admErr=''; render(); }
+    else if (a==='setpro'){
+      const m = Number(el.dataset.v);
+      const { error } = await sb.rpc('mdk_admin_set_plan', { p_store:id, p_months:m }); if (error) throw error;
+      await loadAdmin(); render(); flash(m>0 ? 'Pro berildi' : 'Bepul tarifga qaytarildi');
+    }
+    else if (a==='delstore'){ S.admConfirm=id; render(); }
+    else if (a==='delno'){ S.admConfirm=null; render(); }
+    else if (a==='delyes'){
+      const { error } = await sb.rpc('mdk_admin_delete_store', { p_store:id }); if (error) throw error;
+      S.admConfirm=null; await loadAdmin(); render(); flash("Do'kon o'chirildi");
+    }
+    else if (a==='copyuid'){ const ok = await copyText(S.user.id); flash(ok ? 'Nusxalandi' : "Nusxalab bo'lmadi. Matnni bosib turib belgilang."); }
+    else if (a==='approve' || a==='reject'){
+      const { error } = await sb.rpc('mdk_review_payment', { p_id:id, p_approve:a==='approve' }); if (error) throw error;
+      await loadAdmin(); render(); flash(a==='approve'?'Tasdiqlandi, Pro yoqildi':'Rad etildi');
+    }
+    else if (a==='toggle'){
+      const p=S.products.find(x=>x.id===id); if(!p) return;
+      const { error } = await sb.from('mdk_products').update({active:!p.active}).eq('id',id); if(error) throw error;
+      p.active=!p.active; render();
+    }
+    else if (a==='del'){
+      if (!confirm("Mahsulot o'chirilsinmi?")) return;
+      const { error } = await sb.from('mdk_products').delete().eq('id',id); if(error) throw error;
+      S.products=S.products.filter(x=>x.id!==id); render(); flash("Mahsulot o'chirildi");
+    }
+    else if (a==='ostat'){
+      const { error } = await sb.from('mdk_orders').update({status:el.dataset.v}).eq('id',id); if(error) throw error;
+      const o=S.orders.find(x=>x.id===id); if(o) o.status=el.dataset.v; render();
+    }
+    else if (a==='detail'){ S.detail=S.shopProducts.find(x=>x.id===id)||null; render(); }
+    else if (a==='add'){
+      S.cart[id]=(S.cart[id]||0)+1; saveCart();
+      if (S.detail) { render(); } else { render(); flash("Savatga qo'shildi"); }
+    }
+    else if (a==='inc'){ S.cart[id]=Math.min(99,(S.cart[id]||0)+1); saveCart(); render(); }
+    else if (a==='dec'){ S.cart[id]=(S.cart[id]||0)-1; if(S.cart[id]<=0) delete S.cart[id]; saveCart(); if(!cartCount()){ S.cartOpen=false; if(S.detail && S.detail.id!==id) S.detail=null; } render(); }
+    else if (a==='cart'){ S.detail=null; S.cartOpen=true; render(); }
+  }catch(err){ flash(errText(err)); }
+});
+
+document.addEventListener('change', e=>{
+  if (e.target.name==='img' && e.target.files[0]){
+    const pv = document.getElementById('prev'); pv.src = URL.createObjectURL(e.target.files[0]); pv.style.display='block';
+  }
+});
+
+document.addEventListener('submit', async e=>{
+  e.preventDefault();
+  const f = e.target, fd = new FormData(f), btn = f.querySelector('button[type=submit]');
+  const box = f.querySelector('[id$="Msg"]');
+  btn.disabled = true;
+  try{
+    if (f.id==='authForm'){
+      const email=fd.get('email').trim(), password=fd.get('password');
+      if (S.authMode==='signup'){
+        const { data, error } = await sb.auth.signUp({ email, password }); if (error) throw error;
+        if (!data.session){ note(box,'ok',"Emailingizga tasdiqlash xati yuborildi. Havolani bosing va keyin kiring."); btn.disabled=false; return; }
+      } else {
+        const { error } = await sb.auth.signInWithPassword({ email, password }); if (error) throw error;
+      }
+      return;
+    }
+    if (f.id==='storeForm'){
+      const slug = slugify(fd.get('slug'));
+      const row = { name:fd.get('name').trim(), slug, telegram:cleanTg(fd.get('telegram')), phone:fd.get('phone').trim(), description:fd.get('description').trim() };
+      const { error } = await sb.from('mdk_stores').insert(row); if (error) throw error;
+      await loadMine(); S.tab='products'; render(); flash("Do'kon ochildi. Birinchi mahsulotni qo'shing."); return;
+    }
+    if (f.id==='setForm'){
+      const row = { name:fd.get('name').trim(), telegram:cleanTg(fd.get('telegram')), phone:fd.get('phone').trim(), description:fd.get('description').trim() };
+      const { error } = await sb.from('mdk_stores').update(row).eq('id',S.store.id); if (error) throw error;
+      Object.assign(S.store,row); note(box,'ok','Saqlandi'); btn.disabled=false; return;
+    }
+    if (f.id==='prodForm'){
+      const old = S.editing==='new' ? null : S.products.find(x=>x.id===S.editing);
+      let image_url = old ? old.image_url : '';
+      const file = fd.get('img');
+      if (file && file.size){
+        const blob = await shrink(file);
+        const path = `${S.user.id}/${Date.now()}.webp`;
+        const up = await sb.storage.from('mdk-images').upload(path, blob, { contentType:'image/webp' }); if (up.error) throw up.error;
+        image_url = sb.storage.from('mdk-images').getPublicUrl(path).data.publicUrl;
+      }
+      const row = { name:fd.get('name').trim(), price:Number(fd.get('price')||0), description:fd.get('description').trim(), image_url };
+      if (old){
+        const { data, error } = await sb.from('mdk_products').update(row).eq('id',old.id).select().single(); if (error) throw error;
+        Object.assign(old,data);
+      } else {
+        const { data, error } = await sb.from('mdk_products').insert({ ...row, store_id:S.store.id }).select().single(); if (error) throw error;
+        S.products.unshift(data);
+      }
+      S.editing=null; render(); flash('Saqlandi'); return;
+    }
+    if (f.id==='adminLoginForm'){
+      const { data, error } = await sb.auth.signInWithPassword({ email:fd.get('email').trim(), password:fd.get('password') }); if (error) throw error;
+      S.user = data.user; await checkAdmin();
+      if (!S.isAdmin){ await sb.auth.signOut(); S.user=null; throw new Error('Bu hisob admin emas.'); }
+      S.admErr=''; S.admTab='over'; await loadAdmin(); render(); return;
+    }
+    if (f.id==='cardForm'){
+      const card = fd.get('card').trim(), holder = fd.get('holder').trim();
+      if (!/^[0-9 ]+$/.test(card) || card.replace(/\s/g,'').length!==16) throw new Error("Karta raqami 16 ta raqamdan iborat bo'lsin.");
+      const { error } = await sb.from('mdk_config').upsert([{ key:'pay_card', value:card }, { key:'pay_holder', value:holder }]); if (error) throw error;
+      S.cfg.pay_card=card; S.cfg.pay_holder=holder; note(box,'ok','Saqlandi'); btn.disabled=false; return;
+    }
+    if (f.id==='pwForm'){
+      const p1 = fd.get('p1'), p2 = fd.get('p2');
+      if (p1.length<8) throw new Error("Parol kamida 8 belgidan iborat bo'lsin.");
+      if (p1!==p2) throw new Error('Parollar bir xil emas.');
+      const { error } = await sb.auth.updateUser({ password:p1 }); if (error) throw error;
+      f.reset(); note(box,'ok','Parol almashtirildi. Keyingi kirishda yangi paroldan foydalaning.'); btn.disabled=false; return;
+    }
+    if (f.id==='payForm'){
+      const file = fd.get('receipt');
+      if (!file || !file.size) throw new Error('Chek rasmini yuklang');
+      const blob = await shrink(file, 1400);
+      const path = `${S.user.id}/chek-${Date.now()}.webp`;
+      const up = await sb.storage.from('mdk-receipts').upload(path, blob, { contentType:'image/webp' }); if (up.error) throw up.error;
+      const { error } = await sb.rpc('mdk_submit_payment', { p_months:S.payMonths, p_receipt:path }); if (error) throw error;
+      await loadMine(); S.payOpen=false; render(); flash("Chek yuborildi. Tasdiqlangach Pro yoqiladi."); return;
+    }
+    if (f.id==='orderForm'){
+      const items = S.shopProducts.filter(p=>S.cart[p.id]).map(p=>({ p, qty:S.cart[p.id] }));
+      if (!items.length) throw new Error("Savat bo'sh");
+      const name = fd.get('customer_name').trim(), phone = fd.get('customer_phone').trim(), noteTxt = fd.get('note').trim();
+      const rows = items.map(i=>({ store_id:S.shop.id, product_id:i.p.id, product_name:i.p.name, qty:i.qty, customer_name:name, customer_phone:phone, note:noteTxt }));
+      const { error } = await sb.from('mdk_orders').insert(rows); if (error) throw error;
+      S.orderDone = { items:items.map(i=>({name:i.p.name,qty:i.qty})), total:cartTotal(), name, phone };
+      S.cart = {}; saveCart(); S.cartOpen=false; render(); return;
+    }
+  }catch(err){
+    if (f.id==='adminLoginForm') S.admErr = errText(err);
+    if (box) note(box,'err',errText(err)); else flash(errText(err));
+    btn.disabled=false;
+  }
+});
+
+window.addEventListener('hashchange', route);
+sb.auth.onAuthStateChange((ev, session)=>{
+  const was = S.user && S.user.id;
+  S.user = session ? session.user : null;
+  if ((S.user && S.user.id) !== was){
+    setTimeout(async ()=>{
+      if (S.user){
+        await loadMine(); await checkAdmin();
+        const hh = location.hash || '';
+        if (S.isAdmin && (hh.startsWith('#/admin') || hh.startsWith('#/auth'))) await loadAdmin();
+        if (hh.startsWith('#/auth')) go(S.isAdmin ? '#/admin' : '#/panel'); else render();
+      }
+      else { S.store=null; S.isAdmin=false; S.adm=null; S.payments=[]; render(); }
+    },0);
+  }
+});
+(async()=>{
+  const { data } = await sb.auth.getSession();
+  S.user = data.session ? data.session.user : null;
+  await checkAdmin();
+  await loadCfg();
+  await route();
+})();
+</script>
+</body>
+</html>
